@@ -1,5 +1,12 @@
 #pragma once
 #include "flash_memory_device.h"
+#include <stdexcept>
+
+class ReadFailException : public std::exception
+{
+public:
+    ReadFailException(char const* _Mesage) : exception(_Mesage) {}
+};
 
 class DeviceDriver
 {
