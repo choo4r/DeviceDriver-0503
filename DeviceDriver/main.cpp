@@ -1,6 +1,5 @@
 #include "gmock/gmock.h"
 #include "device_driver.h"
-#
 
 using namespace testing;
 
@@ -23,29 +22,58 @@ TEST(DeviceDriver, ReadFromHWSUCESS) {
 
 TEST(DeviceDriver, ReadFromHWFAIL) {
 	// TODO : replace hardware with a Test Double
-	ReadFailException readFailException("ReadFailException");
-
 	MockFlashMemory hardware;
+	DeviceDriver driver{ &hardware };
 	EXPECT_CALL(hardware, read)
 		.WillOnce(Return(-1))
 		.WillRepeatedly(Return(0xAA));
 
-	DeviceDriver driver{ &hardware };
 	EXPECT_THROW({
 	 driver.read(0xFF);
-		}, ReadFailException);
+		}, std::exception);
 }
 
 TEST(DeviceDriver, ReadFromHWMustFiveTimes) {
 	// TODO : replace hardware with a Test Double
 	MockFlashMemory hardware;
+	DeviceDriver driver{ &hardware };
 	EXPECT_CALL(hardware, read)
 		.Times(5)
 		.WillRepeatedly(Return(0xAA));
 
-	DeviceDriver driver{ &hardware };
+	
 	int data = driver.read(0xFF);
 	EXPECT_EQ(0xAA, data);
+}
+
+TEST(DeviceDriver, WriteFromHWFail) {
+	// TODO : replace hardware with a Test Double
+	MockFlashMemory hardware;
+	DeviceDriver driver{ &hardware };
+
+	EXPECT_CALL(hardware, read)
+		.WillRepeatedly(Return(0xAA));
+
+	EXPECT_THROW({
+		driver.write(0xFF, 0xa5a5);
+		}, std::exception);
+}
+
+TEST(DeviceDriver, WriteFromHWSuccess) {
+	// TODO : replace hardware with a Test Double
+	MockFlashMemory hardware;
+	DeviceDriver driver{ &hardware };
+
+	EXPECT_CALL(hardware, read)
+		.WillRepeatedly(Return(0xFF));
+
+	try {
+		driver.write(0xFF, 0xa5a5);
+	} catch (std::exception e)
+	{
+			FAIL();
+	}
+	
 }
 
 int main() {

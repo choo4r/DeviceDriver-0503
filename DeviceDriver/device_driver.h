@@ -4,8 +4,10 @@
 
 class ReadFailException : public std::exception
 {
-public:
-    ReadFailException(char const* _Mesage) : exception(_Mesage) {}
+};
+
+class WriteFailException : public std::exception
+{
 };
 
 class DeviceDriver
